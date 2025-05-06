@@ -35,7 +35,8 @@ class CustomerController extends Controller
      */
     public function create()
     {
-        return view('customers.create');
+        $slot = '';
+        return view('customers.create',compact('slot'));
     }
     
     public function store(Request $request)
@@ -64,7 +65,8 @@ class CustomerController extends Controller
      */
     public function edit(Customer $customer)
     {
-        return view('customers.edit', compact('customer'));
+        $slot = '';
+        return view('customers.edit', compact('customer','slot'));
     }
 
     /**

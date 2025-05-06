@@ -12,6 +12,7 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
+  
     public function index()
     {
         $slot = '';
@@ -25,7 +26,8 @@ class ProductController extends Controller
      */
     public function create()
     {
-        return view('products.create');
+        $slot = '';
+        return view('products.create' ,compact('slot'));
 
     }
 
@@ -60,7 +62,8 @@ class ProductController extends Controller
      */
     public function edit(Product $product)
     {
-        return view('products.edit', compact('product'));
+        $slot = '';
+        return view('products.edit', compact('product','slot'));
 
     }
 
