@@ -29,6 +29,13 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::resource('products', ProductController::class);
+
+    // Route::post('checkout', ProductController::class, 'checkout');
+    Route::post('/cart/add/{product}', [ProductController::class, 'addToCart'])->name('cart.add');
+    Route::delete('/cart/remove/{id}', [ProductController::class, 'removeFromCart'])->name('cart.remove');
+    Route::post('/checkout', [ProductController::class, 'checkout'])->name('sales.checkout');
+    
+
     Route::resource('customers', CustomerController::class)->middleware('auth');
 
 

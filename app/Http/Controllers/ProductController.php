@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Sale;
+use App\Models\Sales;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -12,8 +14,9 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::latest()->paginate(10);
+        $products = Product::latest()->where('quantity', '>', 0)->paginate(10);
         return view('products.index', compact('products'));
+        
     }
 
     /**
@@ -45,7 +48,8 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        return view('products.edit', compact('product'));
+
+        return view('products.show', compact('product'));
 
     }
 
@@ -82,4 +86,65 @@ class ProductController extends Controller
         $product->delete();
         return redirect()->route('products.index')->with('success', 'Product deleted successfully.');
     }
+    public function addToCart(Request $request, Product $product)
+{
+    $cart = session()->get('cart', []);
+
+    if (isset($cart[$product->id])) {
+        $cart[$product->id]['quantity']++;
+    } else {
+        $cart[$product->id] = [
+            'id' => $product->id,
+            'name' => $product->name,
+            'price' => $product->price,
+            'quantity' => 1
+        ];
+    }
+
+    session()->put('cart', $cart);
+    return back()->with('success', 'Product added to cart.');
+}
+public function removeFromCart($id)
+{
+    $cart = session()->get('cart', []);
+    unset($cart[$id]);
+    session()->put('cart', $cart);
+
+    return back()->with('success', 'Product removed from cart.');
+}
+
+// SaleController.php
+public function checkout()
+{
+    $cart = session('cart', []);
+
+    if (empty($cart)) {
+        return back()->with('error', 'Cart is empty.');
+    }
+
+    $subtotal = collect($cart)->sum(fn($item) => $item['price'] * $item['quantity']);
+    $tax = $subtotal * 0.10;
+    $total = $subtotal + $tax;
+
+    $sale = Sale::create([
+        'user_id' => auth()->id(),
+        'subtotal' => $subtotal,
+        'tax' => $tax,
+        'total' => $total,
+    ]);
+
+    foreach ($cart as $item) {
+        $sale->items()->create([
+            'product_id' => $item['id'],
+            'quantity' => $item['quantity'],
+            'price' => $item['price'],
+        ]);
+
+        Product::where('id', $item['id'])->decrement('quantity', $item['quantity']);
+    }
+
+    session()->forget('cart');
+    return back()->with('success', 'Checkout successful.');
+}
+
 }
