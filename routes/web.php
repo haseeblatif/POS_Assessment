@@ -4,6 +4,8 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Models\Product;
+use App\Models\Customer;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,8 +22,13 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+
+
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    $productCount = Product::count();
+    $customerCount = Customer::count();
+
+    return view('dashboard', compact('productCount', 'customerCount'));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -31,9 +38,10 @@ Route::middleware('auth')->group(function () {
     Route::resource('products', ProductController::class);
 
     // Route::post('checkout', ProductController::class, 'checkout');
-    Route::post('/cart/add/{product}', [ProductController::class, 'addToCart'])->name('cart.add');
-    Route::delete('/cart/remove/{id}', [ProductController::class, 'removeFromCart'])->name('cart.remove');
-    Route::post('/checkout', [ProductController::class, 'checkout'])->name('sales.checkout');
+    Route::post('/cart/add/{product}', [ProductController::class, 'add'])->name('cart.add');
+
+    // Route::delete('/cart/remove/{id}', [ProductController::class, 'removeFromCart'])->name('cart.remove');
+    // Route::post('/checkout', [ProductController::class, 'checkout'])->name('sales.checkout');
     
 
     Route::resource('customers', CustomerController::class)->middleware('auth');

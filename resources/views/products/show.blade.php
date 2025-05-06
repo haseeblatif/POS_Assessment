@@ -92,13 +92,11 @@
         }
     }
 </style>
-
-<div class="product-container">
-    @if($product->image)
-    <div class="product-image">
-        <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}">
-    </div>
+@if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
     @endif
+<div class="product-container">
+   
 
     <div class="product-details">
         <h1 class="product-title">{{ $product->name }}</h1>
@@ -113,7 +111,14 @@
             <h2>Quantity</h2>
             <p>{{ $product->quantity }}</p>
         </div>
-
+        <form action="{{ route('cart.add', $product) }}" method="POST">
+                @csrf
+                <div class="form-group">
+                    <label for="quantity">Quantity</label>
+                    <input type="number" name="quantity" class="form-control" min="1" max="{{ $product->quantity }}" value="1" required>
+                </div>
+                <button class="btn btn-success mt-3">Add to Cart</button>
+            </form>
         <a href="{{ route('products.index') }}" class="back-button">← Back to Products</a>
     </div>
 </div>

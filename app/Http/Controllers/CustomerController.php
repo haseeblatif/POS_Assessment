@@ -12,6 +12,7 @@ class CustomerController extends Controller
      */
     public function index(Request $request)
     {
+        $slot = '';
         $query = Customer::query();
     
         if ($request->filled('search')) {
@@ -23,7 +24,7 @@ class CustomerController extends Controller
     
         $customers = $query->paginate(10)->appends($request->only('search'));
     
-        return view('customers.index', compact('customers'));
+        return view('customers.index', compact('customers','slot'));
     }
     
     
